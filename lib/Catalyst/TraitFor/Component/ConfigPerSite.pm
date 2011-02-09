@@ -61,13 +61,13 @@ default_view TT
 
 =head1 VERSION
 
-0.02
+0.03
 
-Dedicated to Smyler who won the 2009 cryptic christmas crossword competition
+Dedicated to Smylers who won the 2009 cryptic christmas crossword competition
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moose::Role;
 use MRO::Compat;
