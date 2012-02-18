@@ -8,13 +8,13 @@ Catalyst::TraitFor::Model::DBIC::ConfigPerSite - Extend Catalyst DBIC Model to w
 
 =head1 SYNOPSIS
 
-package MyApp::Model::DBIC;
+    package MyApp::Model::DBIC;
 
-use Moose;
+    use Moose;
 
-extends 'Catalyst::Model::DBIC::Schema'; 
+    extends 'Catalyst::Model::DBIC::Schema'; 
 
-with qw(Catalyst::TraitFor::Model::DBIC::ConfigPerSite);
+    with qw(Catalyst::TraitFor::Model::DBIC::ConfigPerSite);
 
 =head1 DESCRIPTION
 
@@ -33,13 +33,15 @@ with qw( Catalyst::Component::InstancePerContext Catalyst::TraitFor::Component::
 
 sub build_per_context_instance {
     my ($self, $c) = @_;
+    return $_[0] unless ref($_[1]);
     my $config = $self->get_component_config($c);
 
     if (my $instance = $self->get_from_instance_cache($config)) {
-	return $instance;
+	    return $instance;
     }
 
     my @connect_info = ( @{$config->{connect_info}}{qw/dsn user password/});
+
     my $new = bless({ %$self }, ref($self));
     $new->config($config);
     $new->schema($self->schema->connect(@connect_info));
@@ -48,7 +50,6 @@ sub build_per_context_instance {
 
     return $new;
 }
-
 
 =head1 SEE ALSO
 

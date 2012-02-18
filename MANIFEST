@@ -30,4 +30,6 @@ t/lib/TestBlogApp/View/TT.pm
 lib/Catalyst/TraitFor/Component/ConfigPerSite.pm
 lib/Catalyst/TraitFor/Model/DBIC/ConfigPerSite.pm
 lib/Catalyst/TraitFor/View/TT/ConfigPerSite.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+lib/Catalyst/Model/DBIC/ConfigPerSite.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

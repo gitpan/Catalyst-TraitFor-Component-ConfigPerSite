@@ -16,68 +16,62 @@ Compose this role into your trait to extend a catalyst component such as a model
 
 =head1 SYNOPSIS
 
-in testblogapp.conf:
+    in testblogapp.conf:
 
-name   TestBlogApp
-site_name    TestBlog
-default_view TT
+    name         TestBlogApp
+    site_name    TestBlog
+    default_view TT
 
-<Model::DB>
+    <Model::DB>
         schema_class TestBlogApp::Schema
         <connect_info>
-                      dsn dbi:SQLite:dbname=t/test.db
-                      user username
-                      password password
+            dsn dbi:SQLite:dbname=t/test.db
+            user username
+            password password
         </connect_info>
-</Model::DB>
+    </Model::DB>
 
-<View::TT>
+    <View::TT>
         TEMPLATE_EXTENSION .tt
         WRAPPER            site-wrapper.tt
         INCLUDE_PATH       t/templates
-</View::TT>
+    </View::TT>
 
-<TraitFor::Component::ConfigPerSite>
- <foo.bar>
-   <Model::DB>
-        schema_class TestBlogApp::Schema
-        <connect_info>
-                      dsn dbi:SQLite:dbname=t/test2.db
-                      user username
-                      password password
-        </connect_info>
-        instance_cache_key foo_bar_model_db
-   </Model::DB>
+    <TraitFor::Component::ConfigPerSite>
+        <foo.bar>
+            <Model::DB>
+                schema_class TestBlogApp::Schema
+                <connect_info>
+                    dsn dbi:SQLite:dbname=t/test2.db
+                    user username
+                    password password
+                </connect_info>
+                instance_cache_key foo_bar_model_db
+            </Model::DB>
 
-   <View::TT>
-        TEMPLATE_EXTENSION .tt
-        WRAPPER            site-wrapper.tt
-        INCLUDE_PATH       t/more_templates
-        instance_cache_key foo_bar_view_tt
-   </View::TT>
+            <View::TT>
+                TEMPLATE_EXTENSION .tt
+                WRAPPER            site-wrapper.tt
+                INCLUDE_PATH       t/more_templates
+                instance_cache_key foo_bar_view_tt
+            </View::TT>
 
- </foo.bar>
-</TraitFor::Component::ConfigPerSite>
+        </foo.bar>
+    </TraitFor::Component::ConfigPerSite>
 
 =head1 VERSION
 
-0.03
-
-Dedicated to Smylers who won the 2009 cryptic christmas crossword competition
+0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Moose::Role;
 use MRO::Compat;
 use Data::Dumper;
 
-use Cache::SizeAwareMemoryCache;
-
-my $cache = new Cache::SizeAwareMemoryCache( { 'namespace' => 'ConfigPerSite',
-					       'default_expires_in' => 600,
-					       'max_size' => 2000 } );
+my $site_config_cache = { };
 
 my $shared_config;
 
@@ -89,7 +83,7 @@ has '_site_config' => ( is  => 'ro' );
 
 return (possibly cached) site-specific configuration based on host and path for this request
 
-my $site_config = $self->get_site_config($c);
+    my $site_config = $self->get_site_config($c);
 
 =cut
 
@@ -104,7 +98,7 @@ sub get_site_config {
     my $path = $req->uri->path;
 
     my $cache_key = $host.$path;
-    my $site_config = $cache->get( $cache_key );
+    my $site_config = $site_config_cache->{$cache_key};
 
     if ( not defined $site_config ) {
 	if (my $host_config = $shared_config->{$host} || $shared_config->{ALL}) {
@@ -138,7 +132,9 @@ sub get_site_config {
 
 
 
-	$cache->set( $cache_key, $site_config, "10 minutes" );
+	$site_config_cache->{$cache_key} = $site_config;
+    } else {
+	carp "no matching site config!\n";
     }
 
 
@@ -149,14 +145,14 @@ sub get_site_config {
 
 return appropriate configuration for this component for this site
 
-my $config = $self->get_component_config;
+    my $config = $self->get_component_config;
 
 =cut
 
 sub get_component_config {
     my ($self, $c) = @_;
-    my $component_name = $self->catalyst_component_name;
 
+    my $component_name = $self->catalyst_component_name;
     my $site_config = $self->get_site_config($c);
     my $appname = $site_config->{name}.'::';
     $component_name =~ s/$appname//;
@@ -167,9 +163,9 @@ sub get_component_config {
 
 =head2 get_from_instance_cache
 
-if (my $instance = $self->get_from_instance_cache($config)) {
-    return $instance;
-}
+    if (my $instance = $self->get_from_instance_cache($config)) {
+        return $instance;
+    }
 
 =cut
 
@@ -187,7 +183,7 @@ sub get_from_instance_cache {
 
 =head2 put_in_instance_cache
 
-   $self->put_in_instance_cache($config, $instance);
+    $self->put_in_instance_cache($config, $instance);
 
 =cut
 
@@ -214,7 +210,7 @@ Aaron Trevena, E<lt>aaron@aarontrevena.co.ukE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Aaron Trevena
+Copyright (C) 2010,2011 by Aaron Trevena
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,
