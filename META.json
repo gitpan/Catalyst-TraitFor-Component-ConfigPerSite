@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Catalyst" : 0,
+            "Catalyst::Plugin::Static::Simple" : 0,
             "Moose" : 0,
             "Test::HTML::Form" : 0,
             "Test::Pod" : 0,
@@ -41,5 +42,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "version" : "0.06"
 }
