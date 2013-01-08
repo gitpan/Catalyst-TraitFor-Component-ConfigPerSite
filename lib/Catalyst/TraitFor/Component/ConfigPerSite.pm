@@ -61,11 +61,11 @@ Compose this role into your trait to extend a catalyst component such as a model
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Moose::Role;
 use MRO::Compat;
@@ -102,7 +102,7 @@ sub get_site_config {
 
     if ( not defined $site_config ) {
         if (my $host_config = $shared_config->{$host} || $shared_config->{ALL}) {
-            if (scalar keys %$host_config > 1) {
+            if (scalar keys %$host_config >= 1) {
                 my @path_parts = split(/\/+/, $path);
                 while (my $last_path_part = pop(@path_parts)) {
                     my $match_path = join ('/',@path_parts,$last_path_part);
